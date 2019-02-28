@@ -12,15 +12,8 @@ from timeless import views
 from timeless.access_control.views import SecuredView
 from timeless.reservations import models
 
+
 bp = Blueprint("reservations", __name__, url_prefix="/reservations")
-
-class ReservationsListView(views.ListView):
-    """ List the Items """
-    model = Reservation
-    template_name = "reservations/list.html"
-
-
-ReservationsListView.register(bp, "/")
 
 class SettingsList(views.ListView):
     """
@@ -68,7 +61,7 @@ class CommentView(SecuredView, views.CrudAPIView):
     list_reservations = "reservation_comment"
 
 
-class ReservationsList(views.CrudAPIView):
+class ReservationsListView(views.CrudAPIView):
     """ Reservation JSON API /api/reservations
 
     """
@@ -100,6 +93,14 @@ class ReservationsList(views.CrudAPIView):
         }
         return jsonify(reservations_json)
 
+
+@bp.route("/",methods=("GET", "POST"))
+def list_reservations(reservations):
+    reservations = ReservationsListView.get(reservations)
+
+    return render_template(
+        "restaurants/tables/list.html", reservations=reservations
+    )
 
 @bp.route("/create", methods=("GET", "POST"))
 def create():
